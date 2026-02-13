@@ -13,13 +13,13 @@
       {
         "id": 1,
         "name": "小宝",
-        "birthday": "",
+        "birthday": "2020-04-13",
         "gender": "female",
-        "avatar": "default"
+        "avatar": "avatar1"
       }
     ],
     "growthData": [],
-    "updatedAt": "2026-02-13T10:42:31.628Z"
+    "updatedAt": "2026-02-13T10:42:39.774Z"
   },
-  "updatedAt": "2026-02-13T10:42:31.629Z"
+  "updatedAt": "2026-02-13T10:42:39.774Z"
 }
