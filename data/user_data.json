@@ -1,0 +1,25 @@
+{
+  "userId": "user_1770979332363",
+  "email": "2127",
+  "data": {
+    "children": [
+      {
+        "id": 0,
+        "name": "小新",
+        "birthday": "2017-08-13",
+        "gender": "female",
+        "avatar": "default"
+      },
+      {
+        "id": 1,
+        "name": "小宝",
+        "birthday": "",
+        "gender": "female",
+        "avatar": "default"
+      }
+    ],
+    "growthData": [],
+    "updatedAt": "2026-02-13T10:42:31.628Z"
+  },
+  "updatedAt": "2026-02-13T10:42:31.629Z"
+}
