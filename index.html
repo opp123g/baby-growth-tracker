@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宝贝成长记录</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="cloud-config.js"></script>
+</head>
+<body>
+    <!-- 登录界面 -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-container">
+            <h1><i class="fas fa-baby"></i> 宝贝成长记录</h1>
+            <p>云端数据存储，随时随地访问</p>
+            
+            <!-- 登录表单 -->
+            <div id="login-form">
+                <div class="input-group">
+                    <label for="login-email">邮箱</label>
+                    <input type="email" id="login-email" class="input" placeholder="请输入邮箱">
+                </div>
+                <div class="input-group">
+                    <label for="login-password">密码</label>
+                    <input type="password" id="login-password" class="input" placeholder="请输入密码">
+                </div>
+                <div class="button-group">
+                    <button class="button" onclick="handleLogin()">登录</button>
+                    <button class="button secondary" onclick="showRegisterForm()">注册新账号</button>
+                </div>
+                <div id="login-error" class="error-message"></div>
+            </div>
+            
+            <!-- 注册表单 -->
+            <div id="register-form" style="display: none;">
+                <div class="input-group">
+                    <label for="register-email">邮箱</label>
+                    <input type="email" id="register-email" class="input" placeholder="请输入邮箱">
+                </div>
+                <div class="input-group">
+                    <label for="register-password">密码</label>
+                    <input type="password" id="register-password" class="input" placeholder="请输入密码（至少6位）">
+                </div>
+                <div class="input-group">
+                    <label for="register-confirm-password">确认密码</label>
+                    <input type="password" id="register-confirm-password" class="input" placeholder="请再次输入密码">
+                </div>
+                <div class="input-group">
+                    <label for="register-token">GitHub Token</label>
+                    <input type="text" id="register-token" class="input" placeholder="请输入GitHub Token（ghp_开头）">
+                    <p style="font-size: 11px; color: #86868b; margin-top: 4px;">
+                        <i class="fas fa-info-circle"></i> 
+                        用于云端存储，<a href="https://github.com/settings/tokens" target="_blank" style="color: #0071e3;">点击创建Token</a>
+                    </p>
+                </div>
+                <div class="button-group">
+                    <button class="button" onclick="handleRegister()">注册</button>
+                    <button class="button secondary" onclick="showLoginForm()">返回登录</button>
+                </div>
+                <div id="register-error" class="error-message"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" style="display: none;">
+        <header>
+            <h1 id="app-title">宝贝成长记录</h1>
+            <p>记录孩子的每一步成长</p>
+        </header>
+
+        <!-- 导航栏 -->
+        <nav>
+            <ul>
+                <li><a href="#home" class="nav-link active"><i class="fas fa-home"></i> 首页</a></li>
+                <li><a href="#record" class="nav-link"><i class="fas fa-edit"></i> 记录</a></li>
+                <li><a href="#analysis" class="nav-link"><i class="fas fa-chart-line"></i> 分析</a></li>
+                <li><a href="#profile" class="nav-link"><i class="fas fa-user"></i> 我的</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <!-- 首页 -->
+            <section id="home" class="section active">
+                <div class="card">
+                    <h2><i class="fas fa-baby"></i> 欢迎使用宝贝成长记录</h2>
+                    <p>记录孩子的每一步成长</p>
+                </div>
+
+                <!-- 手机友好的快捷操作 -->
+                <div class="quick-actions">
+                    <button class="quick-action-btn" onclick="navigateTo('record')">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <div class="quick-action-label">记录数据</div>
+                    </button>
+                    <button class="quick-action-btn" onclick="navigateTo('analysis')">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="quick-action-label">查看分析</div>
+                    </button>
+                </div>
+
+                <!-- 孩子选择 -->
+                <div class="card">
+                    <h2><i class="fas fa-child"></i> 选择孩子</h2>
+                    <input type="hidden" id="child-select" value="0">
+                    <div class="child-tabs">
+                        <div class="child-tab active" data-index="0" onclick="selectChild(0)">
+                            <span>大宝</span>
+                        </div>
+                        <div class="child-tab" data-index="1" onclick="selectChild(1)">
+                            <span>小宝</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 最近记录 -->
+                <div class="card">
+                    <h2><i class="fas fa-history"></i> 最近记录</h2>
+                    <div id="latest-record" class="record-item">
+                        <div class="record-content">
+                            <p>暂无记录</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 记录页面 -->
+            <section id="record" class="section">
+                <div class="card">
+                    <h2><i class="fas fa-edit"></i> 记录成长数据</h2>
+                    
+                    <div class="input-group">
+                        <label>选择孩子</label>
+                        <input type="hidden" id="record-child-select" value="0">
+                        <div class="child-tabs">
+                            <div class="child-tab active" data-index="0" onclick="selectRecordChild(0)">
+                                <span>大宝</span>
+                            </div>
+                            <div class="child-tab" data-index="1" onclick="selectRecordChild(1)">
+                                <span>小宝</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="record-date">记录日期</label>
+                        <input type="date" id="record-date" class="input">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="record-height">身高 (cm)</label>
+                        <input type="number" id="record-height" class="input" placeholder="请输入身高，例如：100">
+                        <div id="height-error" class="error-message"></div>
+                        <div id="height-reference" class="reference-container"></div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="record-weight">体重 (斤)</label>
+                        <input type="number" id="record-weight" class="input" placeholder="请输入体重，例如：40">
+                        <div id="weight-error" class="error-message"></div>
+                        <div id="weight-reference" class="reference-container"></div>
+                    </div>
+                    
+                    <button class="button" onclick="submitRecord()"><i class="fas fa-save"></i> 提交记录</button>
+                    <div id="success-message" class="success-message"></div>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-history"></i> 历史记录</h2>
+                    <div id="history-records" class="history-list">
+                        <p>暂无历史记录</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 分析页面 -->
+            <section id="analysis" class="section">
+                <div class="card">
+                    <h2><i class="fas fa-chart-line"></i> 成长数据分析</h2>
+                    
+                    <div class="input-group">
+                        <label>选择孩子</label>
+                        <input type="hidden" id="analysis-child-select" value="0">
+                        <div class="child-tabs">
+                            <div class="child-tab active" data-index="0" onclick="selectAnalysisChild(0)">
+                                <span>大宝</span>
+                            </div>
+                            <div class="child-tab" data-index="1" onclick="selectAnalysisChild(1)">
+                                <span>小宝</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="analysis-type">选择数据类型</label>
+                        <select id="analysis-type" class="select">
+                            <option value="height">身高曲线</option>
+                            <option value="weight">体重曲线</option>
+                            <option value="both">身高体重对比</option>
+                        </select>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <canvas id="growth-chart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-chart-pie"></i> 统计信息</h2>
+                    <div id="stats-container" class="stats-grid">
+                        <p>暂无数据，请先添加记录</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 个人中心 -->
+            <section id="profile" class="section">
+                <!-- 用户信息卡片 -->
+                <div class="card">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                        <h2><i class="fas fa-user-circle"></i> 我的账号</h2>
+                        <button class="button small danger" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> 退出</button>
+                    </div>
+                    <div id="user-info" style="padding: 12px; background-color: #f9f9f9; border-radius: 8px;">
+                        <p style="margin: 0; color: #86868b;">登录中...</p>
+                    </div>
+                </div>
+                
+                <!-- 孩子管理 -->
+                <div class="card">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                        <h2><i class="fas fa-child"></i> 孩子管理</h2>
+                        <button class="button small" onclick="addChild()"><i class="fas fa-plus"></i> 添加</button>
+                    </div>
+                    <div id="child-list" class="child-list">
+                        <!-- 孩子列表将动态生成 -->
+                    </div>
+                </div>
+                
+                <!-- 数据管理 -->
+                <div class="card">
+                    <h2><i class="fas fa-database"></i> 数据管理</h2>
+                    <div class="list-item" onclick="document.getElementById('import-file').click()">
+                        <div class="list-item-content">
+                            <h3><i class="fas fa-upload"></i> 导入数据</h3>
+                            <p>从文件导入历史记录</p>
+                        </div>
+                        <i class="fas fa-chevron-right icon"></i>
+                    </div>
+                    <input type="file" id="import-file" accept=".csv,.xlsx,.xls" style="display: none;" onchange="handleImportFile(event)">
+                    <div class="list-item" onclick="exportData()">
+                        <div class="list-item-content">
+                            <h3><i class="fas fa-download"></i> 导出数据</h3>
+                            <p>备份所有记录</p>
+                        </div>
+                        <i class="fas fa-chevron-right icon"></i>
+                    </div>
+                    <div class="list-item" onclick="generateShareLink()">
+                        <div class="list-item-content">
+                            <h3><i class="fas fa-share-alt"></i> 分享数据</h3>
+                            <p>生成分享链接给家人</p>
+                        </div>
+                        <i class="fas fa-chevron-right icon"></i>
+                    </div>
+                </div>
+                
+                <!-- 应用设置 -->
+                <div class="card">
+                    <h2><i class="fas fa-cog"></i> 应用设置</h2>
+                    <div class="setting-item">
+                        <div class="setting-label">应用名称</div>
+                        <div class="setting-control">
+                            <input type="text" id="app-name-input" class="input" style="width: 160px; margin-right: 8px;" value="宝贝成长记录">
+                            <button class="button small" onclick="updateAppName()"><i class="fas fa-save"></i></button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 关于 -->
+                <div class="card">
+                    <h2><i class="fas fa-info-circle"></i> 关于</h2>
+                    <div class="list-item">
+                        <div class="list-item-content">
+                            <h3>版本</h3>
+                            <p>2.0.0 云端版</p>
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-content">
+                            <h3>数据存储</h3>
+                            <p>本地 + 云端双重备份</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+                        <h2><i class="fas fa-key"></i> 密码设置</h2>
+                        
+                        <div class="input-group">
+                            <label for="current-password">当前密码</label>
+                            <input type="password" id="current-password" class="input" placeholder="请输入当前密码">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="new-password">新密码</label>
+                            <input type="password" id="new-password" class="input" placeholder="请输入新密码">
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="confirm-password">确认新密码</label>
+                            <input type="password" id="confirm-password" class="input" placeholder="请再次输入新密码">
+                        </div>
+                        
+                        <div id="password-error" class="error-message"></div>
+                        
+                        <div class="button-group">
+                            <button class="button secondary" onclick="closePasswordDialog()"><i class="fas fa-times"></i> 取消</button>
+                            <button class="button" onclick="changePassword()"><i class="fas fa-save"></i> 保存</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-database"></i> 数据管理</h2>
+                    <div class="list-item" onclick="document.getElementById('import-file').click()">
+                        <div class="list-item-content">
+                            <h3><i class="fas fa-upload"></i> 导入数据</h3>
+                            <p>从CSV/Excel文件导入身高体重记录</p>
+                        </div>
+                        <i class="fas fa-chevron-right icon"></i>
+                    </div>
+                    <input type="file" id="import-file" accept=".csv,.xlsx,.xls" style="display: none;" onchange="handleImportFile(event)">
+                    <div class="list-item" onclick="exportData()">
+                        <div class="list-item-content">
+                            <h3><i class="fas fa-download"></i> 导出数据</h3>
+                            <p>将数据导出为Excel格式</p>
+                        </div>
+                        <i class="fas fa-chevron-right icon"></i>
+                    </div>
+                    <div class="list-item" onclick="generateExcelFile()">
+                        <div class="list-item-content">
+                            <h3><i class="fas fa-file-excel"></i> 生成Excel文件</h3>
+                            <p>自动记录身高并包含标准参考</p>
+                        </div>
+                        <i class="fas fa-chevron-right icon"></i>
+                    </div>
+                    <div class="list-item" onclick="clearData()">
+                        <div class="list-item-content">
+                            <h3><i class="fas fa-trash"></i> 清空数据</h3>
+                            <p>清空所有记录数据</p>
+                        </div>
+                        <i class="fas fa-chevron-right icon"></i>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <h2><i class="fas fa-info-circle"></i> 关于</h2>
+                    <div class="list-item">
+                        <div class="list-item-content">
+                            <h3>版本</h3>
+                            <p>1.0.0</p>
+                        </div>
+                    </div>
+                    <div class="list-item">
+                        <div class="list-item-content">
+                            <h3>开发者</h3>
+                            <p>宝贝成长记录团队</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 编辑孩子对话框 -->
+        <div id="edit-dialog" class="dialog">
+            <div class="dialog-content">
+                <h2><i class="fas fa-edit"></i> 编辑孩子信息</h2>
+                
+                <div class="input-group">
+                    <label for="edit-name">孩子姓名</label>
+                    <input type="text" id="edit-name" class="input" placeholder="请输入孩子姓名">
+                </div>
+                
+                <div class="input-group">
+                    <label for="edit-birthday">出生日期</label>
+                    <input type="date" id="edit-birthday" class="input">
+                </div>
+                
+                <div class="input-group">
+                    <label for="edit-age">直接填写年龄 (岁/月)</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="number" id="edit-age-years" class="input" placeholder="岁" min="0" max="12" style="flex: 1;">
+                        <input type="number" id="edit-age-months" class="input" placeholder="月" min="0" max="11" style="flex: 1;">
+                    </div>
+                    <p class="input-hint">如果填写了年龄，系统会自动计算出生日期</p>
+                </div>
+                
+                <div class="input-group">
+                    <label for="edit-gender">性别</label>
+                    <select id="edit-gender" class="select">
+                        <option value="female">女</option>
+                        <option value="male">男</option>
+                    </select>
+                </div>
+                
+                <div class="input-group">
+                    <label>选择头像</label>
+                    <div id="avatar-selector" class="avatar-selector">
+                        <label class="avatar-option">
+                            <input type="radio" name="avatar" value="default" checked>
+                            <div class="avatar-icon"><i class="fas fa-baby"></i></div>
+                        </label>
+                        <label class="avatar-option">
+                            <input type="radio" name="avatar" value="avatar1">
+                            <div class="avatar-icon"><i class="fas fa-child"></i></div>
+                        </label>
+                        <label class="avatar-option">
+                            <input type="radio" name="avatar" value="avatar2">
+                            <div class="avatar-icon"><i class="fas fa-baby-carriage"></i></div>
+                        </label>
+                        <label class="avatar-option">
+                            <input type="radio" name="avatar" value="avatar3">
+                            <div class="avatar-icon"><i class="fas fa-star"></i></div>
+                        </label>
+                        <label class="avatar-option">
+                            <input type="radio" name="avatar" value="avatar4">
+                            <div class="avatar-icon"><i class="fas fa-heart"></i></div>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="button-group">
+                    <button class="button secondary" onclick="closeEditDialog()"><i class="fas fa-times"></i> 取消</button>
+                    <button class="button" onclick="saveChild()"><i class="fas fa-save"></i> 保存</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 确认对话框 -->
+        <div id="confirm-dialog" class="dialog">
+            <div class="dialog-content confirm-dialog">
+                <h2><i class="fas fa-exclamation-triangle"></i> 确认操作</h2>
+                <p id="confirm-message">确定要执行此操作吗？</p>
+                <div class="button-group">
+                    <button class="button secondary" onclick="closeConfirmDialog()"><i class="fas fa-times"></i> 取消</button>
+                    <button class="button danger" onclick="confirmAction()"><i class="fas fa-check"></i> 确认</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
