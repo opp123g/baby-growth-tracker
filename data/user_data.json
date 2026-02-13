@@ -18,8 +18,265 @@
         "avatar": "avatar1"
       }
     ],
-    "growthData": [],
-    "updatedAt": "2026-02-13T10:42:39.774Z"
+    "growthData": [
+      {
+        "id": 1770979371742,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2024-02-18",
+        "height": 122,
+        "weight": 44.2
+      },
+      {
+        "id": 1770979371743,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2024-02-18",
+        "height": 103,
+        "weight": 33.5
+      },
+      {
+        "id": 1770979371744,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2024-02-25",
+        "height": 122,
+        "weight": 44.5
+      },
+      {
+        "id": 1770979371745,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2024-03-15",
+        "height": 122.5,
+        "weight": 44
+      },
+      {
+        "id": 1770979371746,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2024-04-01",
+        "height": 123,
+        "weight": 44.7
+      },
+      {
+        "id": 1770979371747,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2024-04-11",
+        "height": 103.5,
+        "weight": 35.9
+      },
+      {
+        "id": 1770979371748,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2024-05-08",
+        "height": 124.5,
+        "weight": 42.9
+      },
+      {
+        "id": 1770979371749,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2024-05-11",
+        "height": 104.2,
+        "weight": 36
+      },
+      {
+        "id": 1770979371750,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2024-06-17",
+        "height": 105,
+        "weight": 36.5
+      },
+      {
+        "id": 1770979371751,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2024-06-17",
+        "height": 124,
+        "weight": 45
+      },
+      {
+        "id": 1770979371752,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2024-06-30",
+        "height": 126,
+        "weight": 41.6
+      },
+      {
+        "id": 1770979371753,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2024-08-24",
+        "height": 126,
+        "weight": 45
+      },
+      {
+        "id": 1770979371754,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2024-08-24",
+        "height": 109,
+        "weight": 35
+      },
+      {
+        "id": 1770979371755,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2024-11-14",
+        "height": 128.3,
+        "weight": 45.6
+      },
+      {
+        "id": 1770979371756,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2024-11-30",
+        "height": 128.3,
+        "weight": 47
+      },
+      {
+        "id": 1770979371757,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2024-11-30",
+        "height": 110,
+        "weight": 40
+      },
+      {
+        "id": 1770979371758,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2025-01-03",
+        "height": 128,
+        "weight": 49.2
+      },
+      {
+        "id": 1770979371759,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2025-01-03",
+        "height": 111,
+        "weight": 38.4
+      },
+      {
+        "id": 1770979371760,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2025-01-25",
+        "height": 128.5,
+        "weight": 50
+      },
+      {
+        "id": 1770979371761,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2025-01-25",
+        "height": 110,
+        "weight": 40
+      },
+      {
+        "id": 1770979371762,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2025-02-27",
+        "height": 113,
+        "weight": 41
+      },
+      {
+        "id": 1770979371763,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2025-03-27",
+        "height": 131.5,
+        "weight": 50
+      },
+      {
+        "id": 1770979371764,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2025-04-29",
+        "height": 114,
+        "weight": 42
+      },
+      {
+        "id": 1770979371765,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2025-04-29",
+        "height": 131,
+        "weight": 50
+      },
+      {
+        "id": 1770979371766,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2025-06-03",
+        "height": 132,
+        "weight": 50
+      },
+      {
+        "id": 1770979371767,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2025-07-17",
+        "height": 132.5,
+        "weight": 49.7
+      },
+      {
+        "id": 1770979371768,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2025-07-17",
+        "height": 116,
+        "weight": 42.2
+      },
+      {
+        "id": 1770979371769,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2025-10-18",
+        "height": 133.2,
+        "weight": 53
+      },
+      {
+        "id": 1770979371770,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2025-10-29",
+        "height": 117,
+        "weight": 44.4
+      },
+      {
+        "id": 1770979371771,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2025-12-19",
+        "height": 133.4,
+        "weight": 50.6
+      },
+      {
+        "id": 1770979371772,
+        "childId": 1,
+        "childName": "小宝",
+        "date": "2025-12-19",
+        "height": 118.5,
+        "weight": 45.2
+      },
+      {
+        "id": 1770979371773,
+        "childId": 0,
+        "childName": "小新",
+        "date": "2026-01-07",
+        "height": 134.4,
+        "weight": 51
+      }
+    ],
+    "updatedAt": "2026-02-13T10:42:51.741Z"
   },
-  "updatedAt": "2026-02-13T10:42:39.774Z"
+  "updatedAt": "2026-02-13T10:42:51.741Z"
 }
