@@ -722,21 +722,9 @@ function bindEvents() {
         clearButton.addEventListener('click', clearData);
     }
     
-    const editButtons = document.querySelectorAll('button[onclick^="editChild("]');
-    editButtons.forEach((button, index) => {
-        button.addEventListener('click', function() {
-            editChild(index);
-        });
-    });
-    
     const closeDialogButton = document.querySelector('button[onclick="closeEditDialog()"]');
     if (closeDialogButton) {
         closeDialogButton.addEventListener('click', closeEditDialog);
-    }
-    
-    const saveChildButton = document.querySelector('button[onclick="saveChild()"]');
-    if (saveChildButton) {
-        saveChildButton.addEventListener('click', saveChild);
     }
     
     const navigateButtons = document.querySelectorAll('button[onclick^="navigateTo("]');
@@ -1086,10 +1074,40 @@ function drawChart() {
     // 按日期排序
     childRecords.sort((a, b) => new Date(a.date) - new Date(b.date));
     
-    // 准备数据
-    const labels = childRecords.map(record => record.date);
-    const heights = childRecords.map(record => record.height);
-    const weights = childRecords.map(record => record.weight);
+    // 准备数据 - 使用连续的年龄（月）作为X轴
+    const dataMap = new Map(); // 存储每个月的数据
+    
+    childRecords.forEach(record => {
+        const recordDate = new Date(record.date);
+        const ageMonths = calculateAgeInMonths(child.birthday, recordDate);
+        if (!dataMap.has(ageMonths)) {
+            dataMap.set(ageMonths, {
+                height: record.height,
+                weight: record.weight
+            });
+        }
+    });
+    
+    // 找到最小和最大年龄
+    const ages = Array.from(dataMap.keys());
+    const minAge = Math.min(...ages);
+    const maxAge = Math.max(...ages);
+    
+    // 生成连续的年龄标签
+    const labels = [];
+    const heights = [];
+    const weights = [];
+    
+    for (let age = minAge; age <= maxAge; age++) {
+        labels.push(`${age}月`);
+        if (dataMap.has(age)) {
+            heights.push(dataMap.get(age).height);
+            weights.push(dataMap.get(age).weight);
+        } else {
+            heights.push(null);
+            weights.push(null);
+        }
+    }
     
     // 配置图表
     const chartConfig = {
@@ -1165,7 +1183,7 @@ function drawChart() {
                 x: {
                     title: {
                         display: true,
-                        text: '日期',
+                        text: '年龄（月）',
                         font: {
                             size: 14,
                             weight: 'bold'
@@ -1210,6 +1228,7 @@ function drawChart() {
             borderColor: '#0071e3',
             backgroundColor: 'rgba(0, 113, 227, 0.1)',
             tension: 0.4,
+            spanGaps: true, // 跳过null值，连接有数据的点
             pointBackgroundColor: '#0071e3',
             pointBorderColor: '#ffffff',
             pointBorderWidth: 2,
@@ -1220,8 +1239,6 @@ function drawChart() {
         // 添加标准身高对比
         if (child.birthday) {
             const standardHeights = [];
-            const standardHeightsMin = [];
-            const standardHeightsMax = [];
             
             childRecords.forEach(record => {
                 const recordDate = new Date(record.date);
@@ -1230,12 +1247,8 @@ function drawChart() {
                 
                 if (standardHeight) {
                     standardHeights.push(standardHeight.avg);
-                    standardHeightsMin.push(standardHeight.min);
-                    standardHeightsMax.push(standardHeight.max);
                 } else {
                     standardHeights.push(null);
-                    standardHeightsMin.push(null);
-                    standardHeightsMax.push(null);
                 }
             });
             
@@ -1247,27 +1260,7 @@ function drawChart() {
                 backgroundColor: 'rgba(255, 149, 0, 0.1)',
                 borderDash: [5, 5],
                 tension: 0.4,
-                fill: false
-            });
-            
-            // 添加标准身高范围
-            chartConfig.data.datasets.push({
-                label: '标准范围 (cm)',
-                data: standardHeightsMax,
-                borderColor: 'rgba(255, 149, 0, 0.3)',
-                backgroundColor: 'rgba(255, 149, 0, 0.1)',
-                borderDash: [5, 5],
-                tension: 0.4,
-                fill: '+1'
-            });
-            
-            chartConfig.data.datasets.push({
-                label: '标准范围 (cm)',
-                data: standardHeightsMin,
-                borderColor: 'rgba(255, 149, 0, 0.3)',
-                backgroundColor: 'rgba(255, 149, 0, 0.1)',
-                borderDash: [5, 5],
-                tension: 0.4,
+                spanGaps: true,
                 fill: false
             });
         }
