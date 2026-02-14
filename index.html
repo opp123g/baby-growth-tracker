@@ -19,8 +19,8 @@
             <!-- 登录表单 -->
             <div id="login-form">
                 <div class="input-group">
-                    <label for="login-email">邮箱</label>
-                    <input type="email" id="login-email" class="input" placeholder="请输入邮箱">
+                    <label for="login-email">用户名</label>
+                    <input type="text" id="login-email" class="input" placeholder="请输入用户名">
                 </div>
                 <div class="input-group">
                     <label for="login-password">密码</label>
@@ -30,14 +30,17 @@
                     <button class="button" onclick="handleLogin()">登录</button>
                     <button class="button secondary" onclick="showRegisterForm()">注册新账号</button>
                 </div>
+                <p style="text-align: center; margin-top: 12px;">
+                    <a href="#" onclick="showForgotPasswordForm()" style="color: #0071e3; font-size: 13px;">忘记密码？</a>
+                </p>
                 <div id="login-error" class="error-message"></div>
             </div>
             
             <!-- 注册表单 -->
             <div id="register-form" style="display: none;">
                 <div class="input-group">
-                    <label for="register-email">邮箱</label>
-                    <input type="email" id="register-email" class="input" placeholder="请输入邮箱">
+                    <label for="register-email">用户名</label>
+                    <input type="text" id="register-email" class="input" placeholder="请输入用户名">
                 </div>
                 <div class="input-group">
                     <label for="register-password">密码</label>
@@ -46,6 +49,21 @@
                 <div class="input-group">
                     <label for="register-confirm-password">确认密码</label>
                     <input type="password" id="register-confirm-password" class="input" placeholder="请再次输入密码">
+                </div>
+                <div class="input-group">
+                    <label for="register-security-question">安全问题</label>
+                    <select id="register-security-question" class="input">
+                        <option value="">请选择安全问题</option>
+                        <option value="您的出生城市？">您的出生城市？</option>
+                        <option value="您母亲的姓名？">您母亲的姓名？</option>
+                        <option value="您第一只宠物的名字？">您第一只宠物的名字？</option>
+                        <option value="您小学的名字？">您小学的名字？</option>
+                        <option value="您最喜欢的颜色？">您最喜欢的颜色？</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="register-security-answer">安全问题答案</label>
+                    <input type="text" id="register-security-answer" class="input" placeholder="请输入安全问题答案">
                 </div>
                 <div class="input-group">
                     <label for="register-token">GitHub Token</label>
@@ -60,6 +78,57 @@
                     <button class="button secondary" onclick="showLoginForm()">返回登录</button>
                 </div>
                 <div id="register-error" class="error-message"></div>
+            </div>
+            
+            <!-- 忘记密码表单 -->
+            <div id="forgot-password-form" style="display: none;">
+                <h2 style="margin-bottom: 16px;"><i class="fas fa-key"></i> 重置密码</h2>
+                
+                <!-- 第一步：输入用户名 -->
+                <div id="reset-step-1">
+                    <div class="input-group">
+                        <label for="reset-email">用户名</label>
+                        <input type="text" id="reset-email" class="input" placeholder="请输入注册时的用户名">
+                    </div>
+                    <div class="button-group">
+                        <button class="button secondary" onclick="showLoginForm()">返回登录</button>
+                        <button class="button" onclick="verifyEmailForReset()">下一步</button>
+                    </div>
+                </div>
+                
+                <!-- 第二步：回答安全问题 -->
+                <div id="reset-step-2" style="display: none;">
+                    <div class="input-group">
+                        <label>安全问题</label>
+                        <p id="reset-security-question" style="font-weight: 600; color: #1d1d1f;"></p>
+                    </div>
+                    <div class="input-group">
+                        <label for="reset-security-answer">答案</label>
+                        <input type="text" id="reset-security-answer" class="input" placeholder="请输入安全问题答案">
+                    </div>
+                    <div class="button-group">
+                        <button class="button secondary" onclick="showForgotPasswordForm()">上一步</button>
+                        <button class="button" onclick="verifySecurityAnswer()">下一步</button>
+                    </div>
+                </div>
+                
+                <!-- 第三步：设置新密码 -->
+                <div id="reset-step-3" style="display: none;">
+                    <div class="input-group">
+                        <label for="reset-new-password">新密码</label>
+                        <input type="password" id="reset-new-password" class="input" placeholder="请输入新密码（至少6位）">
+                    </div>
+                    <div class="input-group">
+                        <label for="reset-confirm-new-password">确认新密码</label>
+                        <input type="password" id="reset-confirm-new-password" class="input" placeholder="请再次输入新密码">
+                    </div>
+                    <div class="button-group">
+                        <button class="button secondary" onclick="showForgotPasswordForm()">上一步</button>
+                        <button class="button" onclick="resetPasswordFinal()">完成重置</button>
+                    </div>
+                </div>
+                
+                <div id="reset-error" class="error-message"></div>
             </div>
         </div>
     </div>
@@ -224,7 +293,10 @@
                 <div class="card">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
                         <h2><i class="fas fa-user-circle"></i> 我的账号</h2>
-                        <button class="button small danger" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> 退出</button>
+                        <div style="display: flex; gap: 8px;">
+                            <button class="button small" onclick="showResetPasswordDialog()"><i class="fas fa-key"></i> 重置密码</button>
+                            <button class="button small danger" onclick="handleLogout()"><i class="fas fa-sign-out-alt"></i> 退出</button>
+                        </div>
                     </div>
                     <div id="user-info" style="padding: 12px; background-color: #f9f9f9; border-radius: 8px;">
                         <p style="margin: 0; color: #86868b;">登录中...</p>
@@ -298,22 +370,34 @@
                     </div>
                 </div>
             </section>
-                        <h2><i class="fas fa-key"></i> 密码设置</h2>
-                        
-                        <div class="input-group">
-                            <label for="current-password">当前密码</label>
-                            <input type="password" id="current-password" class="input" placeholder="请输入当前密码">
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="new-password">新密码</label>
-                            <input type="password" id="new-password" class="input" placeholder="请输入新密码">
-                        </div>
-                        
-                        <div class="input-group">
-                            <label for="confirm-password">确认新密码</label>
-                            <input type="password" id="confirm-password" class="input" placeholder="请再次输入新密码">
-                        </div>
+            
+            <!-- 重置密码对话框 -->
+            <div id="reset-password-dialog" class="dialog">
+                <div class="dialog-content">
+                    <h2><i class="fas fa-key"></i> 重置密码</h2>
+                    <p>请输入新密码，重置后原密码将失效</p>
+                    
+                    <div class="input-group">
+                        <label for="reset-new-password">新密码</label>
+                        <input type="password" id="reset-new-password" class="input" placeholder="请输入新密码（至少6位）">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="reset-confirm-password">确认新密码</label>
+                        <input type="password" id="reset-confirm-password" class="input" placeholder="请再次输入新密码">
+                    </div>
+                    
+                    <div id="reset-password-error" class="error-message"></div>
+                    
+                    <div class="button-group">
+                        <button class="button secondary" onclick="closeResetPasswordDialog()"><i class="fas fa-times"></i> 取消</button>
+                        <button class="button" onclick="resetPassword()"><i class="fas fa-check"></i> 确认重置</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 密码设置对话框 -->
+            <div id="password-dialog" class="dialog">
                         
                         <div id="password-error" class="error-message"></div>
                         

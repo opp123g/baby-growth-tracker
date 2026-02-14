@@ -403,16 +403,10 @@ async function saveData() {
     localStorage.setItem('growthData', JSON.stringify(growthData));
     
     // 保存到云端
-    const currentUser = authManager.getCurrentUser();
+    const currentUser = cloudAuthManager.getCurrentUser();
     if (currentUser) {
-        const data = {
-            children: children,
-            growthData: growthData,
-            updatedAt: new Date().toISOString()
-        };
-        
         try {
-            await cloudDataManager.saveData(data);
+            await cloudDataManager.saveUserData(currentUser.userId, children, growthData);
         } catch (error) {
             console.log('云端保存失败，数据已保存到本地');
         }
@@ -421,18 +415,27 @@ async function saveData() {
 
 // 从云端加载数据
 async function loadCloudData() {
-    const currentUser = authManager.getCurrentUser();
+    const currentUser = cloudAuthManager.getCurrentUser();
     if (!currentUser) return;
     
     try {
-        const result = await cloudDataManager.loadData();
-        if (result.success && result.data) {
-            if (result.data.children) {
-                children = result.data.children;
+        const result = await cloudDataManager.loadUserData(currentUser.userId);
+        if (result.success) {
+            if (result.children) {
+                children = result.children;
             }
-            if (result.data.growthData) {
-                growthData = result.data.growthData;
+            if (result.records) {
+                growthData = result.records;
             }
+            
+            // 保存到本地存储
+            localStorage.setItem('children', JSON.stringify(children));
+            localStorage.setItem('growthData', JSON.stringify(growthData));
+        }
+    } catch (error) {
+        console.log('从云端加载数据失败，使用本地数据');
+    }
+}
             
             // 保存到本地存储
             localStorage.setItem('children', JSON.stringify(children));
@@ -1558,7 +1561,8 @@ function exportData() {
         const childRecords = growthData.filter(record => record.childId === child.id);
         if (childRecords.length > 0) {
             // 生成CSV格式数据，包含标准身高参考
-            let csvContent = `孩子姓名,出生日期,性别,记录日期,年龄(月),身高(cm),体重(kg),标准身高平均值(cm),标准身高范围(cm)\n`;
+            // 添加UTF-8 BOM以解决Excel乱码问题
+            let csvContent = '\uFEFF孩子姓名,出生日期,性别,记录日期,年龄(月),身高(cm),体重(斤),标准身高平均值(cm),标准身高范围(cm)\n';
             
             childRecords.forEach(record => {
                 const recordDate = new Date(record.date);
@@ -1571,10 +1575,12 @@ function exportData() {
                 csvContent += `${record.childName},${child.birthday || ''},${child.gender === 'female' ? '女' : '男'},${record.date},${ageMonths},${record.height},${record.weight},${standardHeightAvg},${standardHeightRange}\n`;
             });
             
-            // 创建下载链接
-            const encodedUri = encodeURI('data:text/csv;charset=utf-8,' + csvContent);
+            // 创建Blob对象，指定UTF-8编码
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
             const link = document.createElement('a');
-            link.setAttribute('href', encodedUri);
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute('href', url);
             link.setAttribute('download', `${child.name}_成长记录_${new Date().toISOString().split('T')[0]}.csv`);
             document.body.appendChild(link);
             
@@ -1583,6 +1589,7 @@ function exportData() {
             
             // 清理
             document.body.removeChild(link);
+            URL.revokeObjectURL(url);
         }
     });
     
@@ -1597,7 +1604,8 @@ function generateExcelFile() {
     }
     
     // 生成详细的CSV文件，包含所有孩子的数据和标准身高参考
-    let csvContent = `宝贝成长记录,生成日期: ${new Date().toISOString().split('T')[0]}\n\n`;
+    // 添加UTF-8 BOM以解决Excel乱码问题
+    let csvContent = '\uFEFF宝贝成长记录,生成日期: ' + new Date().toISOString().split('T')[0] + '\n\n';
     
     children.forEach(child => {
         const childRecords = growthData.filter(record => record.childId === child.id);
@@ -1605,7 +1613,7 @@ function generateExcelFile() {
             csvContent += `${child.name}的成长记录\n`;
             csvContent += `出生日期: ${child.birthday || '未设置'}\n`;
             csvContent += `性别: ${child.gender === 'female' ? '女' : '男'}\n\n`;
-            csvContent += `记录日期,年龄(月),身高(cm),体重(kg),标准身高平均值(cm),标准身高范围(cm),身高评价\n`;
+            csvContent += `记录日期,年龄(月),身高(cm),体重(斤),标准身高平均值(cm),标准身高范围(cm),身高评价\n`;
             
             childRecords.forEach(record => {
                 const recordDate = new Date(record.date);
@@ -1633,10 +1641,12 @@ function generateExcelFile() {
         }
     });
     
-    // 创建下载链接
-    const encodedUri = encodeURI('data:text/csv;charset=utf-8,' + csvContent);
+    // 创建Blob对象，指定UTF-8编码
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
-    link.setAttribute('href', encodedUri);
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
     link.setAttribute('download', `宝贝成长记录_${new Date().toISOString().split('T')[0]}.csv`);
     document.body.appendChild(link);
     
@@ -1645,6 +1655,7 @@ function generateExcelFile() {
     
     // 清理
     document.body.removeChild(link);
+    URL.revokeObjectURL(url);
     
     alert('Excel文件生成成功！');
 }
@@ -1684,16 +1695,37 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () 
 function showLoginForm() {
     document.getElementById('login-form').style.display = 'block';
     document.getElementById('register-form').style.display = 'none';
+    document.getElementById('forgot-password-form').style.display = 'none';
 }
 
 // 显示注册表单
 function showRegisterForm() {
     document.getElementById('login-form').style.display = 'none';
     document.getElementById('register-form').style.display = 'block';
+    document.getElementById('forgot-password-form').style.display = 'none';
+}
+
+// 显示忘记密码表单
+function showForgotPasswordForm() {
+    document.getElementById('login-form').style.display = 'none';
+    document.getElementById('register-form').style.display = 'none';
+    document.getElementById('forgot-password-form').style.display = 'block';
+    
+    // 重置步骤
+    document.getElementById('reset-step-1').style.display = 'block';
+    document.getElementById('reset-step-2').style.display = 'none';
+    document.getElementById('reset-step-3').style.display = 'none';
+    
+    // 清空输入框
+    document.getElementById('reset-email').value = '';
+    document.getElementById('reset-security-answer').value = '';
+    document.getElementById('reset-new-password').value = '';
+    document.getElementById('reset-confirm-new-password').value = '';
+    document.getElementById('reset-error').textContent = '';
 }
 
 // 处理登录
-function handleLogin() {
+async function handleLogin() {
     const email = document.getElementById('login-email').value.trim();
     const password = document.getElementById('login-password').value;
     const loginError = document.getElementById('login-error');
@@ -1710,20 +1742,36 @@ function handleLogin() {
         return;
     }
     
-    const result = authManager.login(email, password);
+    // 显示加载状态
+    if (loginError) loginError.textContent = '登录中...';
     
-    if (result.success) {
-        showApp();
-    } else {
-        if (loginError) loginError.textContent = result.message;
+    // 获取Token
+    const token = prompt('请输入您的GitHub Token：');
+    if (!token) {
+        if (loginError) loginError.textContent = '请输入GitHub Token';
+        return;
+    }
+    
+    try {
+        const result = await cloudAuthManager.login(email, password, token);
+        
+        if (result.success) {
+            showApp();
+        } else {
+            if (loginError) loginError.textContent = result.message;
+        }
+    } catch (error) {
+        if (loginError) loginError.textContent = '登录失败：' + error.message;
     }
 }
 
 // 处理注册
-function handleRegister() {
+async function handleRegister() {
     const email = document.getElementById('register-email').value.trim();
     const password = document.getElementById('register-password').value;
     const confirmPassword = document.getElementById('register-confirm-password').value;
+    const securityQuestion = document.getElementById('register-security-question').value;
+    const securityAnswer = document.getElementById('register-security-answer').value.trim();
     const token = document.getElementById('register-token').value.trim();
     const registerError = document.getElementById('register-error');
     
@@ -1744,29 +1792,145 @@ function handleRegister() {
         return;
     }
     
+    if (!securityQuestion) {
+        if (registerError) registerError.textContent = '请选择安全问题';
+        return;
+    }
+    
+    if (!securityAnswer) {
+        if (registerError) registerError.textContent = '请输入安全问题答案';
+        return;
+    }
+    
     if (!token) {
         if (registerError) registerError.textContent = '请输入GitHub Token';
         return;
     }
     
-    const result = authManager.register(email, password, token);
+    // 显示加载状态
+    if (registerError) registerError.textContent = '注册中...';
     
-    if (result.success) {
-        // 注册成功后自动登录
-        const loginResult = authManager.login(email, password);
-        if (loginResult.success) {
+    try {
+        const result = await cloudAuthManager.register(email, password, securityQuestion, securityAnswer, token);
+        
+        if (result.success) {
             showApp();
+        } else {
+            if (registerError) registerError.textContent = result.message;
         }
-    } else {
-        if (registerError) registerError.textContent = result.message;
+    } catch (error) {
+        if (registerError) registerError.textContent = '注册失败：' + error.message;
+    }
+}
+
+// 密码重置 - 第一步：验证邮箱
+async function verifyEmailForReset() {
+    const email = document.getElementById('reset-email').value.trim();
+    const resetError = document.getElementById('reset-error');
+    
+    if (resetError) resetError.textContent = '';
+    
+    if (!email) {
+        if (resetError) resetError.textContent = '请输入邮箱';
+        return;
+    }
+    
+    // 显示加载状态
+    if (resetError) resetError.textContent = '验证中...';
+    
+    try {
+        const result = await cloudAuthManager.verifyEmailForReset(email);
+        
+        if (result.success) {
+            // 显示安全问题
+            document.getElementById('reset-security-question').textContent = result.securityQuestion;
+            document.getElementById('reset-step-1').style.display = 'none';
+            document.getElementById('reset-step-2').style.display = 'block';
+            document.getElementById('reset-step-3').style.display = 'none';
+            if (resetError) resetError.textContent = '';
+            
+            // 保存userId
+            window.resetUserId = result.userId;
+        } else {
+            if (resetError) resetError.textContent = result.message;
+        }
+    } catch (error) {
+        if (resetError) resetError.textContent = '验证失败：' + error.message;
+    }
+}
+
+// 密码重置 - 第二步：验证安全问题
+async function verifySecurityAnswer() {
+    const answer = document.getElementById('reset-security-answer').value.trim();
+    const resetError = document.getElementById('reset-error');
+    
+    if (resetError) resetError.textContent = '';
+    
+    if (!answer) {
+        if (resetError) resetError.textContent = '请输入安全问题答案';
+        return;
+    }
+    
+    // 显示加载状态
+    if (resetError) resetError.textContent = '验证中...';
+    
+    try {
+        const result = await cloudAuthManager.verifySecurityAnswer(window.resetUserId, answer);
+        
+        if (result.success) {
+            // 显示设置新密码
+            document.getElementById('reset-step-1').style.display = 'none';
+            document.getElementById('reset-step-2').style.display = 'none';
+            document.getElementById('reset-step-3').style.display = 'block';
+            if (resetError) resetError.textContent = '';
+        } else {
+            if (resetError) resetError.textContent = result.message;
+        }
+    } catch (error) {
+        if (resetError) resetError.textContent = '验证失败：' + error.message;
+    }
+}
+
+// 密码重置 - 第三步：设置新密码
+async function resetPasswordFinal() {
+    const newPassword = document.getElementById('reset-new-password').value;
+    const confirmPassword = document.getElementById('reset-confirm-new-password').value;
+    const resetError = document.getElementById('reset-error');
+    
+    if (resetError) resetError.textContent = '';
+    
+    if (!newPassword || newPassword.length < 6) {
+        if (resetError) resetError.textContent = '密码长度至少6位';
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        if (resetError) resetError.textContent = '两次输入的密码不一致';
+        return;
+    }
+    
+    // 显示加载状态
+    if (resetError) resetError.textContent = '重置中...';
+    
+    try {
+        const result = await cloudAuthManager.resetPassword(window.resetUserId, newPassword);
+        
+        if (result.success) {
+            alert('密码重置成功！请使用新密码登录。');
+            showLoginForm();
+        } else {
+            if (resetError) resetError.textContent = result.message;
+        }
+    } catch (error) {
+        if (resetError) resetError.textContent = '重置失败：' + error.message;
     }
 }
 
 // 显示应用
-function showApp() {
+async function showApp() {
     document.getElementById('login-screen').style.display = 'none';
     document.querySelector('.container').style.display = 'block';
-    initApp();
+    await initApp();
     updateUserInfo();
 }
 
@@ -1841,6 +2005,71 @@ function updateUserInfo() {
             </div>
         `;
     }
+}
+
+// 显示重置密码对话框
+function showResetPasswordDialog() {
+    const dialog = document.getElementById('reset-password-dialog');
+    if (dialog) {
+        dialog.classList.add('show');
+    }
+    
+    // 清空输入框
+    const newPassword = document.getElementById('reset-new-password');
+    const confirmPassword = document.getElementById('reset-confirm-password');
+    const errorElement = document.getElementById('reset-password-error');
+    
+    if (newPassword) newPassword.value = '';
+    if (confirmPassword) confirmPassword.value = '';
+    if (errorElement) errorElement.textContent = '';
+}
+
+// 关闭重置密码对话框
+function closeResetPasswordDialog() {
+    const dialog = document.getElementById('reset-password-dialog');
+    if (dialog) {
+        dialog.classList.remove('show');
+    }
+}
+
+// 重置密码
+function resetPassword() {
+    const newPassword = document.getElementById('reset-new-password').value;
+    const confirmPassword = document.getElementById('reset-confirm-password').value;
+    const errorElement = document.getElementById('reset-password-error');
+    
+    if (errorElement) errorElement.textContent = '';
+    
+    // 验证
+    if (!newPassword || newPassword.length < 6) {
+        if (errorElement) errorElement.textContent = '密码长度至少6位';
+        return;
+    }
+    
+    if (newPassword !== confirmPassword) {
+        if (errorElement) errorElement.textContent = '两次输入的密码不一致';
+        return;
+    }
+    
+    // 获取当前用户
+    const currentUser = authManager.getCurrentUser();
+    if (!currentUser) {
+        if (errorElement) errorElement.textContent = '请先登录';
+        return;
+    }
+    
+    // 更新密码
+    currentUser.password = authManager.hashPassword(newPassword);
+    authManager.saveUsers();
+    
+    // 更新localStorage中的当前用户
+    localStorage.setItem('current_user', JSON.stringify(currentUser));
+    
+    // 关闭对话框
+    closeResetPasswordDialog();
+    
+    // 显示成功提示
+    alert('密码重置成功！');
 }
 
 // 添加孩子
