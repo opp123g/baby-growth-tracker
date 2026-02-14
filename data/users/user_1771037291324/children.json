@@ -1,6 +1,6 @@
 {
   "userId": "user_1771037291324",
-  "lastUpdated": "2026-02-14T03:23:11.257Z",
+  "lastUpdated": "2026-02-14T03:23:17.968Z",
   "children": [
     {
       "id": 0,
@@ -22,13 +22,6 @@
       "birthday": "2020-10-15",
       "gender": "female",
       "avatar": "default"
-    },
-    {
-      "id": 3,
-      "name": "小新",
-      "birthday": "2017-08-15",
-      "gender": "female",
-      "avatar": "avatar1"
     }
   ]
 }
