@@ -1776,14 +1776,69 @@ function updateUserInfo() {
     const currentUser = authManager.getCurrentUser();
     
     if (userInfoElement && currentUser) {
+        // 计算账号使用天数
+        const createdDate = new Date(currentUser.createdAt);
+        const today = new Date();
+        const daysUsed = Math.floor((today - createdDate) / (1000 * 60 * 60 * 24));
+        
+        // 检查Token状态
+        const tokenStatus = currentUser.token ? '已设置' : '未设置';
+        const tokenColor = currentUser.token ? '#34c759' : '#ff3b30';
+        
+        // 检查数据状态
+        const dataCount = growthData ? growthData.length : 0;
+        const childrenCount = children ? children.length : 0;
+        
         userInfoElement.innerHTML = `
-            <p style="margin: 0 0 8px 0; font-size: 16px; font-weight: 600; color: #1d1d1f;">
-                <i class="fas fa-envelope" style="margin-right: 8px; color: #0071e3;"></i>
-                ${currentUser.email}
-            </p>
-            <p style="margin: 0; font-size: 12px; color: #86868b;">
-                注册时间：${new Date(currentUser.createdAt).toLocaleDateString('zh-CN')}
-            </p>
+            <div style="margin-bottom: 16px;">
+                <p style="margin: 0 0 4px 0; font-size: 14px; color: #86868b;">账号邮箱</p>
+                <p style="margin: 0; font-size: 18px; font-weight: 600; color: #1d1d1f;">
+                    <i class="fas fa-envelope" style="margin-right: 8px; color: #0071e3;"></i>
+                    ${currentUser.email}
+                </p>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px;">
+                <div>
+                    <p style="margin: 0 0 4px 0; font-size: 12px; color: #86868b;">注册时间</p>
+                    <p style="margin: 0; font-size: 14px; font-weight: 500; color: #1d1d1f;">
+                        ${createdDate.toLocaleDateString('zh-CN')}
+                    </p>
+                </div>
+                <div>
+                    <p style="margin: 0 0 4px 0; font-size: 12px; color: #86868b;">使用天数</p>
+                    <p style="margin: 0; font-size: 14px; font-weight: 500; color: #1d1d1f;">
+                        ${daysUsed} 天
+                    </p>
+                </div>
+            </div>
+            
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-bottom: 16px;">
+                <div>
+                    <p style="margin: 0 0 4px 0; font-size: 12px; color: #86868b;">孩子数量</p>
+                    <p style="margin: 0; font-size: 14px; font-weight: 500; color: #1d1d1f;">
+                        ${childrenCount} 个
+                    </p>
+                </div>
+                <div>
+                    <p style="margin: 0 0 4px 0; font-size: 12px; color: #86868b;">记录数量</p>
+                    <p style="margin: 0; font-size: 14px; font-weight: 500; color: #1d1d1f;">
+                        ${dataCount} 条
+                    </p>
+                </div>
+            </div>
+            
+            <div style="padding: 8px; background-color: #fff; border-radius: 6px; border: 1px solid #e3e3e3;">
+                <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <span style="font-size: 12px; color: #86868b;">
+                        <i class="fas fa-key" style="margin-right: 4px;"></i>
+                        GitHub Token
+                    </span>
+                    <span style="font-size: 12px; font-weight: 500; color: ${tokenColor};">
+                        ${tokenStatus}
+                    </span>
+                </div>
+            </div>
         `;
     }
 }
