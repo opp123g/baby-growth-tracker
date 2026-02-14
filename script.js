@@ -1,8 +1,5 @@
 // 全局变量
-let children = [
-    { id: 0, name: '大宝', birthday: '', gender: 'female' },
-    { id: 1, name: '小宝', birthday: '', gender: 'female' }
-];
+let children = [];
 let growthData = [];
 let currentChart = null;
 let editingChildIndex = null;
@@ -1421,6 +1418,49 @@ function editChild(index) {
     if (editDialog) editDialog.classList.add('show');
 }
 
+// 删除孩子
+function deleteChild(index) {
+    const child = children[index];
+    if (!child) return;
+    
+    // 确认删除
+    if (!confirm(`确定要删除"${child.name}"吗？\n\n删除后将同时删除该孩子的所有成长记录！`)) {
+        return;
+    }
+    
+    // 删除孩子的成长记录
+    growthData = growthData.filter(record => record.childId !== child.id);
+    
+    // 删除孩子
+    children.splice(index, 1);
+    
+    // 更新其他孩子的ID
+    children.forEach((c, i) => {
+        c.id = i;
+    });
+    
+    // 更新成长记录中的childId
+    growthData.forEach(record => {
+        const newChild = children.find(c => c.name === record.childName);
+        if (newChild) {
+            record.childId = newChild.id;
+        }
+    });
+    
+    // 保存数据
+    saveData();
+    
+    // 更新页面
+    updateChildSelectors();
+    updateChildList();
+    updateHomePage();
+    updateHistoryRecords();
+    updateStats();
+    drawChart();
+    
+    alert('删除成功！');
+}
+
 // 关闭编辑对话框
 function closeEditDialog() {
     const editDialog = document.getElementById('edit-dialog');
@@ -1542,6 +1582,7 @@ function updateChildList() {
                 </div>
                 <div class="list-item-actions">
                     <button class="button small" onclick="editChild(${index})"><i class="fas fa-edit"></i> 编辑</button>
+                    <button class="button small danger" onclick="deleteChild(${index})"><i class="fas fa-trash"></i> 删除</button>
                 </div>
             </div>
         `;
