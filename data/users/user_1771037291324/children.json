@@ -1,25 +1,18 @@
 {
   "userId": "user_1771037291324",
-  "lastUpdated": "2026-02-14T03:00:09.764Z",
+  "lastUpdated": "2026-02-14T03:23:21.574Z",
   "children": [
     {
       "id": 0,
       "name": "小新",
-      "birthday": "2017-08-14",
+      "birthday": "2017-08-15",
       "gender": "female",
       "avatar": "avatar1"
     },
     {
       "id": 1,
-      "name": "小宝",
-      "birthday": "2020-10-14",
-      "gender": "female",
-      "avatar": "default"
-    },
-    {
-      "id": 2,
-      "name": "小宝",
-      "birthday": "2020-10-14",
+      "name": "小依",
+      "birthday": "2020-10-15",
       "gender": "female",
       "avatar": "default"
     }
