@@ -436,15 +436,6 @@ async function loadCloudData() {
         console.log('从云端加载数据失败，使用本地数据');
     }
 }
-            
-            // 保存到本地存储
-            localStorage.setItem('children', JSON.stringify(children));
-            localStorage.setItem('growthData', JSON.stringify(growthData));
-        }
-    } catch (error) {
-        console.log('从云端加载数据失败，使用本地数据');
-    }
-}
 
 // 更新孩子选择器
 function updateChildSelectors() {
