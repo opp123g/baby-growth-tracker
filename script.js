@@ -1482,27 +1482,37 @@ function saveChild() {
             gender: gender,
             avatar: avatar
         };
-        
-        // 保存数据
-        saveData();
-        
-        // 更新选择器
-        updateChildSelectors();
-        
-        // 关闭对话框
-        closeEditDialog();
-        
-        // 显示成功消息
-        alert('保存成功！');
-        
-        // 更新页面
-        updateHomePage();
-        updateHistoryRecords();
-        drawChart();
-        updateHeightReference();
-        updateWeightReference();
-        updateChildList();
+    } else {
+        // 添加新孩子
+        const newChild = {
+            id: children.length,
+            name: name,
+            birthday: birthday,
+            gender: gender,
+            avatar: avatar
+        };
+        children.push(newChild);
     }
+    
+    // 保存数据
+    saveData();
+    
+    // 更新选择器
+    updateChildSelectors();
+    
+    // 关闭对话框
+    closeEditDialog();
+    
+    // 显示成功消息
+    alert('保存成功！');
+    
+    // 更新页面
+    updateHomePage();
+    updateHistoryRecords();
+    drawChart();
+    updateHeightReference();
+    updateWeightReference();
+    updateChildList();
 }
 
 // 更新孩子列表显示

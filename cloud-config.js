@@ -176,6 +176,7 @@ class CloudAuthManager {
 
         // 设置当前用户
         this.currentUser = newUser;
+        this.currentUser.token = token;
         localStorage.setItem('current_user', JSON.stringify(newUser));
 
         return { 
@@ -298,6 +299,7 @@ class CloudAuthManager {
 
         // 设置当前用户
         this.currentUser = user;
+        this.currentUser.token = token;
         localStorage.setItem('current_user', JSON.stringify(user));
 
         return { 
