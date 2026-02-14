@@ -2033,7 +2033,7 @@ function closeResetPasswordDialog() {
 }
 
 // 重置密码
-function resetPassword() {
+async function resetPassword() {
     const newPassword = document.getElementById('reset-new-password').value;
     const confirmPassword = document.getElementById('reset-confirm-password').value;
     const errorElement = document.getElementById('reset-password-error');
@@ -2059,11 +2059,13 @@ function resetPassword() {
     }
     
     // 更新密码
-    currentUser.password = cloudAuthManager.hashPassword(newPassword);
-    cloudAuthManager.saveUsers();
+    currentUser.passwordHash = cloudAuthManager.hashPassword(newPassword);
     
     // 更新localStorage中的当前用户
     localStorage.setItem('current_user', JSON.stringify(currentUser));
+    
+    // 保存到云端
+    await cloudAuthManager.saveAccounts();
     
     // 关闭对话框
     closeResetPasswordDialog();
