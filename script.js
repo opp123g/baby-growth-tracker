@@ -1733,7 +1733,7 @@ async function handleLogin() {
     if (loginError) loginError.textContent = '';
     
     if (!email) {
-        if (loginError) loginError.textContent = '请输入邮箱';
+        if (loginError) loginError.textContent = '请输入用户名';
         return;
     }
     
@@ -1778,7 +1778,7 @@ async function handleRegister() {
     if (registerError) registerError.textContent = '';
     
     if (!email) {
-        if (registerError) registerError.textContent = '请输入邮箱';
+        if (registerError) registerError.textContent = '请输入用户名';
         return;
     }
     
@@ -1831,7 +1831,7 @@ async function verifyEmailForReset() {
     if (resetError) resetError.textContent = '';
     
     if (!email) {
-        if (resetError) resetError.textContent = '请输入邮箱';
+        if (resetError) resetError.textContent = '请输入用户名';
         return;
     }
     
