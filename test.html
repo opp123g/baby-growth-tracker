@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试页面</title>
+</head>
+<body>
+    <h1>JavaScript测试页面</h1>
+    <button onclick="alert('按钮点击成功！')">测试按钮</button>
+    <div id="result"></div>
+    
+    <script src="cloud-config.js"></script>
+    <script>
+        console.log('cloud-config.js加载成功');
+        console.log('cloudAuthManager:', cloudAuthManager);
+        console.log('cloudDataManager:', cloudDataManager);
+        
+        function testFunction() {
+            document.getElementById('result').textContent = 'JavaScript正常工作！';
+            alert('JavaScript正常工作！');
+        }
+    </script>
+</body>
+</html>
