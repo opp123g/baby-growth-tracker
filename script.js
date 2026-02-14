@@ -1937,7 +1937,7 @@ async function showApp() {
 // 更新用户信息显示
 function updateUserInfo() {
     const userInfoElement = document.getElementById('user-info');
-    const currentUser = authManager.getCurrentUser();
+    const currentUser = cloudAuthManager.getCurrentUser();
     
     if (userInfoElement && currentUser) {
         // 计算账号使用天数
@@ -2052,15 +2052,15 @@ function resetPassword() {
     }
     
     // 获取当前用户
-    const currentUser = authManager.getCurrentUser();
+    const currentUser = cloudAuthManager.getCurrentUser();
     if (!currentUser) {
         if (errorElement) errorElement.textContent = '请先登录';
         return;
     }
     
     // 更新密码
-    currentUser.password = authManager.hashPassword(newPassword);
-    authManager.saveUsers();
+    currentUser.password = cloudAuthManager.hashPassword(newPassword);
+    cloudAuthManager.saveUsers();
     
     // 更新localStorage中的当前用户
     localStorage.setItem('current_user', JSON.stringify(currentUser));
@@ -2101,7 +2101,7 @@ function addChild() {
 
 // 登出
 function handleLogout() {
-    authManager.logout();
+    cloudAuthManager.logout();
     document.getElementById('login-screen').style.display = 'flex';
     document.querySelector('.container').style.display = 'none';
     showLoginForm();
@@ -2109,7 +2109,7 @@ function handleLogout() {
 
 // 页面加载时检查登录状态
 window.addEventListener('DOMContentLoaded', () => {
-    const currentUser = authManager.getCurrentUser();
+    const currentUser = cloudAuthManager.getCurrentUser();
     if (currentUser) {
         showApp();
     } else {
