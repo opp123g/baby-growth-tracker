@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>测试script.js</title>
+</head>
+<body>
+    <h1>测试script.js</h1>
+    <button onclick="showLoginForm()">测试showLoginForm</button>
+    <button onclick="showRegisterForm()">测试showRegisterForm</button>
+    <div id="result"></div>
+    
+    <script src="cloud-config.js"></script>
+    <script src="script.js"></script>
+    <script>
+        console.log('script.js加载成功');
+        console.log('showLoginForm:', showLoginForm);
+        console.log('showRegisterForm:', showRegisterForm);
+        console.log('handleLogin:', handleLogin);
+        console.log('handleRegister:', handleRegister);
+    </script>
+</body>
+</html>
